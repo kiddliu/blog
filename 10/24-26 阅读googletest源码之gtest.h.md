@@ -1,4 +1,4 @@
-Starts to read googletest release 1.8.0 source code
+24-26 阅读googletest源码之gtest.h
 ===================================================
 
 十九号的面试失败其实是不出意外的：四个月的C++/Windows准备期间由于基础薄弱以及自我认知的一些偏差，侧重点主要放到了我认为的基础知识方面。那么从这周开始我的转型任务是在余下三本进阶C++书籍之外，开始着重阅读一些实际工程的代码。在Google了一番之后，大部分来自网络上的建议是从Google自己的C++源码看起，例如[googletest](https://github.com/google/googletest)、[protocol buffer](https://github.com/google/protobuf)还有[chromium](https://github.com/chromium/chromium)。
@@ -76,3 +76,37 @@ string FLAGS_GTEST_STREAM_RESULT_TO
 * `TestInfo`用来记录`TestCase`名称、`Test`名称、`Test`是否应该被执行、用来创建`Test`对象的函数指针，以及`TestResult`
 * `TestCase`用来管理一系列的`TestInfo`，一样包含类似`TestInfo`的相关信息，可以被继承
 * `Environment`接口，用`SetUp`和`TearDown`而不是构造函数和析构函数来管理环境的建立与销毁
+* `TestEventListener`接口，用来跟踪测试执行过程，按下列顺序触发
+
+  ```cpp
+  OnTestProgramStart
+  OnTestIterationStart
+  OnEnvironmentsSetUpStart
+  OnEnvironmentsSetUpEnd
+  OnTestCaseStart
+  OnTestStart
+  OnTestPartResult
+  OnTestEnd
+  OnTestCaseEnd
+  OnEnvironmentsTearDownStart
+  OnEnvironmentsTearDownEnd
+  OnTestIterationEnd
+  OnTestProgramEnd  
+  ```
+* `EmptyTestEventListener`是`TestEventListener`的一个空白实现：当只需要重写接口中某一个或某几个方法的时候，继承它而不是接口本身会更加方便。
+* `TestEventListeners`用来管理所有的`TestEventListener`，其中包括默认的输出到控制台的`default_result_printer`、输出到XML文件的`default_xml_generator_`、广播转发事件给所有注册的`TestEventListener`的`repeater`。
+* `UnitTest`是一个单例类，包含了一系列的`TestCase`。只要调用得当，那么这个类就是线程安全的。通过公开方法可以获取当前的工作目录，当前的`TestCase`，当前的`TestInfo`等等相关的各种信息。而私有部分暴露添加测试结果的方法，gtest提供的各种断言宏最终都会调用。核心的实现，则是通过pimpl模式实现的。
+
+  在声明中，多次使用了空白的宏，比如`GTEST_LOCK_EXCLUDED_(mutex_)`从而起到注解作用。
+
+在这之后是`testing::internal`命名空间的各种辅助函数模板，一系列的`IsSubString`全局函数，对数值参数化测试（Value Parameterized Tests）的支持，一系列生成结果的宏（`AddFailure`、`ADD_FAILURE_AT`，`GTEST_FAIL`、`GTEST_SUCCEED`），一系列的断言宏（`EXPECT_*`、`GTEST_ASSERT_*`）。
+
+最后是整个gtest的核心定义
+```cpp
+#define GTEST_TEST(test_case_name, test_name)
+#define TEST_F(test_fixture, test_name)
+
+inline int RUN_ALL_TESTS()
+```
+
+至此gtest.h头文件就结束了。
