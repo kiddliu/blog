@@ -39,3 +39,25 @@ string FLAGS_GTEST_STREAM_RESULT_TO ""
 * [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html)真的很混乱
 
 * [Resharper C++](https://www.jetbrains.com/resharper-cpp/)对于我这种小白真的很好用（手动捂脸）
+
+之后的代码是
+
+* `AssertHelper`的实现
+
+* `UnitTestOptions`的实现：透过解析命令行参数获取当前执行测试的一些选项（例如需要过滤的测试、输出文件地址的变更）
+
+* `ScopedFakeTestPartResultReporter`的实现，用来测试googletest本身以及那些衍生产品
+
+* `SingleFailureChecker`、`DefaultGlobalTestPartResultReporter`、`DefaultPerThreadTestPartResultReporter`都是`UnitTestImpl`的辅助类
+
+接下来是一些辅助函数，例如获取时间、操作字符串。再之后是
+
+* `Message`的实现，用来输出`AssertionResult`错误信息
+
+* `AssertionResult`的实现
+
+* 一个计算字符串替换最小步骤的[Wagner-Fischer算法](https://en.wikipedia.org/wiki/Wagner-Fischer_algorithm)，这个是diff机制的基础
+
+  这里大量用到了匿名命名空间
+
+* 
