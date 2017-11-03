@@ -60,4 +60,10 @@ string FLAGS_GTEST_STREAM_RESULT_TO ""
 
   这里大量用到了匿名命名空间
 
-* 
+* 一系列辅助方法来判断浮点数、整形、枚举、字符串、HRESULT表达式是否一致从而输出`AssertionSuccess`或是`AssertionFailure`
+
+  其中里边涉及到了浮点数比较的方法，googletest选用了4个ULP单位的精度来判断两浮点数是否相等。关于浮点数相等的判断，专门翻译了一篇[博客](https://github.com/kiddliu/blog/blob/master/11/1-3%20%E6%B5%AE%E7%82%B9%E6%95%B0%E7%9A%84%E6%AF%94%E8%BE%83.md)。之后如果有时间，可以专门把这一系列文章都翻译一遍。
+
+* 内部字符串类成员方法的实现
+
+  TODO: 应该把C++世界常用的字符串转换和字符串格式化总结一下
